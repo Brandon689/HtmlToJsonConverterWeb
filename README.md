@@ -4,7 +4,7 @@ A web-based tool to convert HTML into JSON format with various parsing options.
 
 ## 🌎 Live Website
 
-Visit our live converter: [HTML to JSON Converter](https://htmltojsonconverter.azurewebsites.net/)
+Visit our free live converter: [HTML to JSON Converter](https://htmltojsonconverter.azurewebsites.net/)
 
 Try it out now! Convert your HTML to JSON with just a few clicks.
 
