@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="1.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="HTMLConverter">
+      <HintPath>..\..\..\..\..\..\..\2024\25\HTMLConverter\HTMLConverter\bin\Debug\net8.0\HTMLConverter.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

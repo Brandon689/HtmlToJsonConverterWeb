@@ -1,0 +1,147 @@
+﻿@model ConversionModel
+
+<h2>HTML to JSON Converter</h2>
+
+<form id="conversionForm">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="HtmlInput">HTML Input:</label>
+                <textarea id="HtmlInput"></textarea>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="JsonOutput">JSON Output:</label>
+                <textarea id="JsonOutput" readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="ParserMode">Parser Mode:</label>
+                <select id="ParserMode" class="form-control">
+                    <option value="0">Generic</option>
+                    <option value="1">Table</option>
+                    <option value="2">JsonLd</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="AttributePrefix">Attribute Prefix:</label>
+                <input id="AttributePrefix" type="text" class="form-control" value="@@" />
+            </div>
+
+            <div class="form-group">
+                <label for="TextPropertyName">Text Property Name:</label>
+                <input id="TextPropertyName" type="text" class="form-control" value="#text" />
+            </div>
+
+            <div class="form-group">
+                <label for="ValueNewLineConversion">New Line Conversion:</label>
+                <select id="ValueNewLineConversion" class="form-control">
+                    <option value="0">None</option>
+                    <option value="1">Space</option>
+                    <option value="2">Comma</option>
+                    <option value="3">CommaSpace</option>
+                    <option value="4">SemiColon</option>
+                    <option value="5">SemiColonSpace</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-check">
+                <input id="Indent" type="checkbox" class="form-check-input" checked />
+                <label for="Indent" class="form-check-label">Indent JSON</label>
+            </div>
+
+            <div class="form-check">
+                <input id="UnescapeJson" type="checkbox" class="form-check-input" />
+                <label for="UnescapeJson" class="form-check-label">Unescape JSON</label>
+            </div>
+
+            <div class="form-check">
+                <input id="TrimInsideWords" type="checkbox" class="form-check-input" />
+                <label for="TrimInsideWords" class="form-check-label">Trim Inside Words</label>
+            </div>
+
+            <div class="form-check">
+                <input id="ConvertAllTables" type="checkbox" class="form-check-input" />
+                <label for="ConvertAllTables" class="form-check-label">Convert All Tables</label>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Convert</button>
+</form>
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/mode/javascript/javascript.min.js"></script>
+    <script>
+        var htmlEditor, jsonEditor;
+
+        $(document).ready(function () {
+            // Initialize CodeMirror for HTML input
+            htmlEditor = CodeMirror.fromTextArea(document.getElementById("HtmlInput"), {
+                mode: "xml",
+                theme: "eclipse",
+                lineNumbers: true,
+                autoCloseTags: true
+            });
+
+            // Initialize CodeMirror for JSON output
+            jsonEditor = CodeMirror.fromTextArea(document.getElementById("JsonOutput"), {
+                mode: "application/json",
+                theme: "eclipse",
+                lineNumbers: true,
+                readOnly: true
+            });
+
+            // Adjust editor heights and font size
+            htmlEditor.setSize(null, 600);
+            jsonEditor.setSize(null, 600);
+
+            // Set font size for both editors
+            htmlEditor.getWrapperElement().style.fontSize = "13px";
+            jsonEditor.getWrapperElement().style.fontSize = "13px";
+
+            $('#conversionForm').on('submit', function (e) {
+                e.preventDefault();
+                var formData = {
+                    HtmlInput: htmlEditor.getValue(),
+                    ParserMode: parseInt($('#ParserMode').val()),
+                    AttributePrefix: $('#AttributePrefix').val(),
+                    TextPropertyName: $('#TextPropertyName').val(),
+                    ValueNewLineConversion: parseInt($('#ValueNewLineConversion').val()),
+                    Indent: $('#Indent').is(':checked'),
+                    UnescapeJson: $('#UnescapeJson').is(':checked'),
+                    TrimInsideWords: $('#TrimInsideWords').is(':checked'),
+                    ConvertAllTables: $('#ConvertAllTables').is(':checked')
+                };
+
+                $.ajax({
+                    url: '@Url.Action("Convert", "Converter")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        if (response.success) {
+                            jsonEditor.setValue(response.result);
+                            jsonEditor.autoFormatRange({ line: 0, ch: 0 }, { line: jsonEditor.lineCount() });
+                        } else {
+                            alert('Error: ' + response.error);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                        alert('An error occurred: ' + error);
+                    }
+                });
+            });
+        });
+    </script>
+}
